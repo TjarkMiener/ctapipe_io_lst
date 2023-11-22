@@ -518,6 +518,7 @@ class LSTEventSource(EventSource):
             r1.pixel_status = pixel_status
             r1.event_type = EventType(zfits_event.event_type)
             r1.event_time = trigger.time
+            r1.calibration_monitoring_id = self.r0_r1_calibrator.calib_mon_id
 
         array_event.r1.tel[self.tel_id] = r1
 
@@ -1071,6 +1072,7 @@ class LSTEventSource(EventSource):
             r1.event_time = cta_high_res_to_time(
                 zfits_event.trigger_time_s, zfits_event.trigger_time_qns,
             )
+            r1.calibration_monitoring_id = self.r0_r1_calibrator.calib_mon_id
 
         return r0, r1
 

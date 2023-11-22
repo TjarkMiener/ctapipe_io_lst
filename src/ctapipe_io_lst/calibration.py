@@ -1,4 +1,5 @@
 from functools import lru_cache
+import re
 
 import numpy as np
 import astropy.units as u
@@ -196,6 +197,7 @@ class LSTR0Corrections(TelescopeComponent):
         )
 
         self.mon_data = None
+        self.calib_mon_id = None
         self.last_readout_time = {}
         self.first_cap = {}
         self.first_cap_old = {}
@@ -219,7 +221,7 @@ class LSTR0Corrections(TelescopeComponent):
             self.gain_selector = None
 
         if self.calibration_path is not None:
-            self.mon_data = self._read_calibration_file(self.calibration_path)
+            self.mon_data, self.calib_mon_id = self._read_calibration_file(self.calibration_path)
 
     def apply_drs4_corrections(self, event: LSTArrayEventContainer):
         self.update_first_capacitors(event)
@@ -366,7 +368,10 @@ class LSTR0Corrections(TelescopeComponent):
                     flatfield=next(h5_table.read(f'/{base}/flatfield', FlatFieldContainer)),
                     pixel_status=next(h5_table.read(f"/{base}/pixel_status", PixelStatusContainer)),
                 )
-        return mon
+
+        calib_mon_id = int(re.findall(r'\d+', str(path))[-3]+re.findall(r'\d+', str(path))[-2])
+
+        return mon, calib_mon_id
 
     @staticmethod
     def load_drs4_time_calibration_file(path):
